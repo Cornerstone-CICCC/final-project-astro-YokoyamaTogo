@@ -1,17 +1,67 @@
 ---
+import ProductGrid from "../components/ProductGrid.astro"
+import Layout from "../layouts/Layout.astro"
+import { catalog } from "../models/ProductCatalog"
 
+const products = catalog.getAllProducts()
+const categories = catalog.getCategories()
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Product Listing">
+  <section class="mb-8">
+    <h1 class="mt-2 text-4xl font-bold tracking-tight text-stone-950">Products</h1>
+  </section>
+
+  <section class="mb-6 flex flex-wrap gap-2" aria-label="Product filters">
+    <button
+      class="filter-button rounded-md bg-stone-950 px-4 py-2 text-sm font-medium text-white"
+      type="button"
+      data-category="all"
+    >
+      All
+    </button>
+    {
+      categories.map((category: string) => (
+        <button
+          class="filter-button rounded-md bg-white px-4 py-2 text-sm font-medium capitalize text-stone-800 ring-1 ring-stone-200 hover:bg-stone-100"
+          type="button"
+          data-category={category}
+        >
+          {category}
+        </button>
+      ))
+    }
+  </section>
+
+  <ProductGrid products={products} />
+
+  <script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>(".filter-button")
+    const cards = document.querySelectorAll<HTMLElement>(".product-card")
+
+    function setActiveButton(activeButton: HTMLButtonElement): void {
+      buttons.forEach((button: HTMLButtonElement): void => {
+        const isActive = button === activeButton
+        button.classList.toggle("bg-stone-950", isActive)
+        button.classList.toggle("text-white", isActive)
+        button.classList.toggle("bg-white", !isActive)
+        button.classList.toggle("text-stone-800", !isActive)
+        button.classList.toggle("ring-1", !isActive)
+        button.classList.toggle("ring-stone-200", !isActive)
+      })
+    }
+
+    buttons.forEach((button: HTMLButtonElement): void => {
+      button.addEventListener("click", (): void => {
+        const selectedCategory = button.dataset.category ?? "all"
+
+        cards.forEach((card: HTMLElement): void => {
+          const shouldShow = selectedCategory === "all" || card.dataset.category === selectedCategory
+          card.classList.toggle("hidden", !shouldShow)
+        })
+
+        setActiveButton(button)
+      })
+    })
+  </script>
+</Layout>
