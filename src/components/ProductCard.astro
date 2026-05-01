@@ -1,0 +1,36 @@
+---
+import type { Product } from "../models/Product";
+
+interface Props {
+  product: Product;
+}
+
+const { product }: Props = Astro.props;
+const stockClass = product.isInStock()
+  ? "text-sm font-medium text-emerald-700"
+  : "text-sm font-medium text-red-700";
+const stockLabel = product.isInStock() ? "In stock" : "Out of stock";
+---
+
+<article
+  class="product-card flex h-full flex-col overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm"
+  data-category={product.category}
+>
+  <div class="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-amber-100 via-stone-100 to-zinc-200">
+    <span class="text-sm font-medium uppercase tracking-wide text-stone-500">{product.category}</span>
+  </div>
+  <div class="flex flex-1 flex-col gap-3 p-5">
+    <div>
+      <p class="text-sm capitalize text-stone-500">{product.category}</p>
+      <h2 class="mt-1 text-xl font-semibold text-stone-950">{product.title}</h2>
+    </div>
+    <p class="text-lg font-semibold text-amber-700">{product.getFormattedPrice()}</p>
+    <p class={stockClass}>{stockLabel}</p>
+    <a
+      class="mt-auto inline-flex w-fit rounded-md bg-stone-950 px-4 py-2 text-sm font-medium text-white hover:bg-stone-800"
+      href={`/products/${product.getSlug()}/`}
+    >
+      View details
+    </a>
+  </div>
+</article>
